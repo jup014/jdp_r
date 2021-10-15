@@ -134,7 +134,7 @@ There are a few ways to do this. In general, I pursue a good balance between per
 
 #### Let's make a sample data.
 
-```{r echo=FALSE}
+```{r}
 
 # let's clean up the memory
 rm(list=ls())
