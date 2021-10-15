@@ -42,6 +42,32 @@ pacman::p_load(tidyverse, readxl, writexl)
 
 ## File Read
 
+Before we proceed to file reading, we need sample data files.
+
+
+### [FYI] Sample File Generation
+
+This is only for sample data generation. You don't have to get it now.
+
+```{r}
+c1 <- c(1,2,3,4,5)
+c2 <- c(2,3,4,5,6)
+c3 <- c(3,4,5,6,7)
+dt1 <- data.frame(c1=c1, c2=c2, c3=c3)
+rm(list=c("c1", "c2", "c3"))
+
+# save it to csv
+write.csv(x = dt1, file = "test.csv")
+
+# save it to xlsx format
+pacman::p_load(writexl)
+write_xlsx(x = dt1, path = "test.xlsx")
+
+
+# save it to Rdata format (THIS IS FASTEST!!)
+save(dt1, file = "test.Rdata")
+```
+
 ### CSV File read
 
 You can read CSV files with ***read.csv*** function.
@@ -99,26 +125,3 @@ print("We can see we have dt1 variable again")
 ```
 
 
-
-### [FYI] Sample File Generation
-
-This is only for sample data generation. You don't have to get it now.
-
-```{r}
-c1 <- c(1,2,3,4,5)
-c2 <- c(2,3,4,5,6)
-c3 <- c(3,4,5,6,7)
-dt1 <- data.frame(c1=c1, c2=c2, c3=c3)
-rm(list=c("c1", "c2", "c3"))
-
-# save it to csv
-write.csv(x = dt1, file = "test.csv")
-
-# save it to xlsx format
-pacman::p_load(writexl)
-write_xlsx(x = dt1, path = "test.xlsx")
-
-
-# save it to Rdata format (THIS IS FASTEST!!)
-save(dt1, file = "test.Rdata")
-```
