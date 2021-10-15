@@ -177,3 +177,224 @@ print("We can see we have dt1 variable again")
 ```
 
     ## [1] "We can see we have dt1 variable again"
+
+## Data Cleansing
+
+### How to remove rows where all \[some\] columns are NA
+
+There are a few ways to do this. In general, I pursue a good balance
+between performance, readability, and extendability. This will be my
+optimal solution, but not the fastest one.
+
+#### Let’s make a sample data.
+
+    ##  [1] "X1"  "X2"  "X3"  "X4"  "X5"  "X6"  "X7"  "X8"  "X9"  "X10" "X11" "X12"
+    ## [13] "X13" "X14" "X15" "X16" "X17" "X18" "X19" "X20" "X21" "X22" "X23" "X24"
+    ## [25] "X25" "X26" "X27" "X28" "X29" "X30" "X31" "X32" "X33" "X34" "X35" "X36"
+    ## [37] "X37" "X38" "X39" "X40" "X41" "X42" "X43" "X44" "X45" "X46" "X47" "X48"
+    ## [49] "X49" "X50"
+
+#### Let’s filter them out\!\!
+
+I illustrated so many use cases, in order of complexity. Wayne, you can
+read it through, or just read the last one.
+
+``` r
+# if X2 is NA, exclude them
+dt2 <- dt1 %>% filter(!is.na(X2))  # if X2 is not(!) NA, leave them. Otherwise, filter out.
+head(dt2)
+```
+
+    ##   pids X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X20
+    ## 1    1  2  4  4  5 NA  1  5  1  3   5   3   2   4   1   1   1   5   4   4   5
+    ## 2    2  2  2  5  2  5  2  4  4  3  NA   5   5   3   5   3   4   1   3   1   4
+    ## 3    3  3  5  2 NA  1  2  3  1  2   1   3   2   1   1   3   4   1   1  NA  NA
+    ## 4    4 NA  3 NA  3  2  5  4  2  2   1   4   4   5   5   2   2   1   4   4   1
+    ## 5    5  3  3  3  2  2  3  3  5  3   4   1  NA   2   2   5   5   2   2   5   3
+    ## 6    6  4  5  5  4  3  1  2  3  3   1   4   1   2   3   2   2   5   5   5   3
+    ##   X21 X22 X23 X24 X25 X26 X27 X28 X29 X30 X31 X32 X33 X34 X35 X36 X37 X38 X39
+    ## 1  NA   3   2   5   2   4   5   5   1   2   4   4  NA   1   1   5   1   1   4
+    ## 2   5   5   4   3   3   4   5   5   5   3   3   3   3   3   5   4   3   5   2
+    ## 3   4   3   5   5   3   1   4   1   5   2   1   1   2   4  NA   3   1   3   4
+    ## 4   3   1   5   5  NA   5   3   1   4   5   5   2   4   3   3   3  NA   1   5
+    ## 5   3   3   4   5   3   1   5   5   1   3   5   5   4   1   3   1   4   1   3
+    ## 6   4   3   2   3  NA   3   2   4   4   5   1   5   4   4   2   5   4  NA   2
+    ##   X40 X41 X42 X43 X44 X45 X46 X47 X48 X49 X50
+    ## 1   1   2  NA   1   3   3   2   3   5   3   4
+    ## 2   3   4   5   4   2   2   1   1   4   2   1
+    ## 3   5   4   3   4   4   5   1   4   5   1   2
+    ## 4   5   3   4   5   5   2   2   2   2   4   3
+    ## 5   5   1   5   5   5   2   4   1   5   1   5
+    ## 6   5   5   4  NA   4   5   4   1   1   5   3
+
+``` r
+# if X2 and X3 are both NA, exclude them
+
+dt3 <- dt1 %>% filter(!(is.na(X2) & is.na(X3))) # if X2 is not(!) NA and X3 is not NA, leave them. Otherwise, filter out.
+head(dt3)
+```
+
+    ##   pids X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X20
+    ## 1    1  2  4  4  5 NA  1  5  1  3   5   3   2   4   1   1   1   5   4   4   5
+    ## 2    2  2  2  5  2  5  2  4  4  3  NA   5   5   3   5   3   4   1   3   1   4
+    ## 3    3  3  5  2 NA  1  2  3  1  2   1   3   2   1   1   3   4   1   1  NA  NA
+    ## 4    4 NA  3 NA  3  2  5  4  2  2   1   4   4   5   5   2   2   1   4   4   1
+    ## 5    5  3  3  3  2  2  3  3  5  3   4   1  NA   2   2   5   5   2   2   5   3
+    ## 6    6  4  5  5  4  3  1  2  3  3   1   4   1   2   3   2   2   5   5   5   3
+    ##   X21 X22 X23 X24 X25 X26 X27 X28 X29 X30 X31 X32 X33 X34 X35 X36 X37 X38 X39
+    ## 1  NA   3   2   5   2   4   5   5   1   2   4   4  NA   1   1   5   1   1   4
+    ## 2   5   5   4   3   3   4   5   5   5   3   3   3   3   3   5   4   3   5   2
+    ## 3   4   3   5   5   3   1   4   1   5   2   1   1   2   4  NA   3   1   3   4
+    ## 4   3   1   5   5  NA   5   3   1   4   5   5   2   4   3   3   3  NA   1   5
+    ## 5   3   3   4   5   3   1   5   5   1   3   5   5   4   1   3   1   4   1   3
+    ## 6   4   3   2   3  NA   3   2   4   4   5   1   5   4   4   2   5   4  NA   2
+    ##   X40 X41 X42 X43 X44 X45 X46 X47 X48 X49 X50
+    ## 1   1   2  NA   1   3   3   2   3   5   3   4
+    ## 2   3   4   5   4   2   2   1   1   4   2   1
+    ## 3   5   4   3   4   4   5   1   4   5   1   2
+    ## 4   5   3   4   5   5   2   2   2   2   4   3
+    ## 5   5   1   5   5   5   2   4   1   5   1   5
+    ## 6   5   5   4  NA   4   5   4   1   1   5   3
+
+``` r
+# if one or more among X2, X3, X4, X5 is NA, exclude them
+
+dt4 <- dt1 %>% filter(!across(c(X2, X3, X4, X5), is.na))
+head(dt4)
+```
+
+    ##   pids X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X20
+    ## 1    1  2  4  4  5 NA  1  5  1  3   5   3   2   4   1   1   1   5   4   4   5
+    ## 2    2  2  2  5  2  5  2  4  4  3  NA   5   5   3   5   3   4   1   3   1   4
+    ## 3    3  3  5  2 NA  1  2  3  1  2   1   3   2   1   1   3   4   1   1  NA  NA
+    ## 4    4 NA  3 NA  3  2  5  4  2  2   1   4   4   5   5   2   2   1   4   4   1
+    ## 5    5  3  3  3  2  2  3  3  5  3   4   1  NA   2   2   5   5   2   2   5   3
+    ## 6    6  4  5  5  4  3  1  2  3  3   1   4   1   2   3   2   2   5   5   5   3
+    ##   X21 X22 X23 X24 X25 X26 X27 X28 X29 X30 X31 X32 X33 X34 X35 X36 X37 X38 X39
+    ## 1  NA   3   2   5   2   4   5   5   1   2   4   4  NA   1   1   5   1   1   4
+    ## 2   5   5   4   3   3   4   5   5   5   3   3   3   3   3   5   4   3   5   2
+    ## 3   4   3   5   5   3   1   4   1   5   2   1   1   2   4  NA   3   1   3   4
+    ## 4   3   1   5   5  NA   5   3   1   4   5   5   2   4   3   3   3  NA   1   5
+    ## 5   3   3   4   5   3   1   5   5   1   3   5   5   4   1   3   1   4   1   3
+    ## 6   4   3   2   3  NA   3   2   4   4   5   1   5   4   4   2   5   4  NA   2
+    ##   X40 X41 X42 X43 X44 X45 X46 X47 X48 X49 X50
+    ## 1   1   2  NA   1   3   3   2   3   5   3   4
+    ## 2   3   4   5   4   2   2   1   1   4   2   1
+    ## 3   5   4   3   4   4   5   1   4   5   1   2
+    ## 4   5   3   4   5   5   2   2   2   2   4   3
+    ## 5   5   1   5   5   5   2   4   1   5   1   5
+    ## 6   5   5   4  NA   4   5   4   1   1   5   3
+
+``` r
+# if all of X2, X3, X4, X5 are NA, exclude them
+# I guess This is the best way for us, because we need to specify all the exact column names, without mistakes.
+
+# for these columns,
+col_names = c("X2", "X3", "X4", "X5")
+
+# make a NA count column
+## 1. Select all of columns in col_names from the original dataset ("." denotes the original dataset),
+## 2. If the field is NA, count it as 1. otherwise count it as 0.
+## 3. Calculate the sum for each row.
+## 4. Leave only the na count is less than the number of columns in  col_names
+dt5 <- dt1 %>% 
+  mutate(na_count=rowSums(is.na(select(., all_of(col_names))))) %>%
+  filter(na_count<length(col_names))
+
+# exclude "na_count" column
+head(dt5 %>% select(-na_count))
+```
+
+    ##   pids X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X20
+    ## 1    1  2  4  4  5 NA  1  5  1  3   5   3   2   4   1   1   1   5   4   4   5
+    ## 2    2  2  2  5  2  5  2  4  4  3  NA   5   5   3   5   3   4   1   3   1   4
+    ## 3    3  3  5  2 NA  1  2  3  1  2   1   3   2   1   1   3   4   1   1  NA  NA
+    ## 4    4 NA  3 NA  3  2  5  4  2  2   1   4   4   5   5   2   2   1   4   4   1
+    ## 5    5  3  3  3  2  2  3  3  5  3   4   1  NA   2   2   5   5   2   2   5   3
+    ## 6    6  4  5  5  4  3  1  2  3  3   1   4   1   2   3   2   2   5   5   5   3
+    ##   X21 X22 X23 X24 X25 X26 X27 X28 X29 X30 X31 X32 X33 X34 X35 X36 X37 X38 X39
+    ## 1  NA   3   2   5   2   4   5   5   1   2   4   4  NA   1   1   5   1   1   4
+    ## 2   5   5   4   3   3   4   5   5   5   3   3   3   3   3   5   4   3   5   2
+    ## 3   4   3   5   5   3   1   4   1   5   2   1   1   2   4  NA   3   1   3   4
+    ## 4   3   1   5   5  NA   5   3   1   4   5   5   2   4   3   3   3  NA   1   5
+    ## 5   3   3   4   5   3   1   5   5   1   3   5   5   4   1   3   1   4   1   3
+    ## 6   4   3   2   3  NA   3   2   4   4   5   1   5   4   4   2   5   4  NA   2
+    ##   X40 X41 X42 X43 X44 X45 X46 X47 X48 X49 X50
+    ## 1   1   2  NA   1   3   3   2   3   5   3   4
+    ## 2   3   4   5   4   2   2   1   1   4   2   1
+    ## 3   5   4   3   4   4   5   1   4   5   1   2
+    ## 4   5   3   4   5   5   2   2   2   2   4   3
+    ## 5   5   1   5   5   5   2   4   1   5   1   5
+    ## 6   5   5   4  NA   4   5   4   1   1   5   3
+
+``` r
+# if all of X2 ... X40 are NA, exclude them
+
+# column names are generated by lapply (=list apply) function. This is just a trick that can be used in this example.
+col_names = unlist(lapply(seq(2, 40), function(x) paste0("X", x)))
+dt6 <- dt1 %>% 
+  mutate(na_count=rowSums(is.na(select(., all_of(col_names))))) %>%
+  filter(na_count<length(col_names))
+
+head(dt6 %>% select(-na_count))
+```
+
+    ##   pids X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X20
+    ## 1    1  2  4  4  5 NA  1  5  1  3   5   3   2   4   1   1   1   5   4   4   5
+    ## 2    2  2  2  5  2  5  2  4  4  3  NA   5   5   3   5   3   4   1   3   1   4
+    ## 3    3  3  5  2 NA  1  2  3  1  2   1   3   2   1   1   3   4   1   1  NA  NA
+    ## 4    4 NA  3 NA  3  2  5  4  2  2   1   4   4   5   5   2   2   1   4   4   1
+    ## 5    5  3  3  3  2  2  3  3  5  3   4   1  NA   2   2   5   5   2   2   5   3
+    ## 6    6  4  5  5  4  3  1  2  3  3   1   4   1   2   3   2   2   5   5   5   3
+    ##   X21 X22 X23 X24 X25 X26 X27 X28 X29 X30 X31 X32 X33 X34 X35 X36 X37 X38 X39
+    ## 1  NA   3   2   5   2   4   5   5   1   2   4   4  NA   1   1   5   1   1   4
+    ## 2   5   5   4   3   3   4   5   5   5   3   3   3   3   3   5   4   3   5   2
+    ## 3   4   3   5   5   3   1   4   1   5   2   1   1   2   4  NA   3   1   3   4
+    ## 4   3   1   5   5  NA   5   3   1   4   5   5   2   4   3   3   3  NA   1   5
+    ## 5   3   3   4   5   3   1   5   5   1   3   5   5   4   1   3   1   4   1   3
+    ## 6   4   3   2   3  NA   3   2   4   4   5   1   5   4   4   2   5   4  NA   2
+    ##   X40 X41 X42 X43 X44 X45 X46 X47 X48 X49 X50
+    ## 1   1   2  NA   1   3   3   2   3   5   3   4
+    ## 2   3   4   5   4   2   2   1   1   4   2   1
+    ## 3   5   4   3   4   4   5   1   4   5   1   2
+    ## 4   5   3   4   5   5   2   2   2   2   4   3
+    ## 5   5   1   5   5   5   2   4   1   5   1   5
+    ## 6   5   5   4  NA   4   5   4   1   1   5   3
+
+``` r
+# if all of X's except pid and X36, exclude them
+
+
+# if you're sure what you're doing, do this.
+# it looks into all other columns, count the NAs in there, and if the number of NAs is fewer than the number of columns, it leaves. Otherwise, it excludes.
+col_names = colnames(dt1)
+col_names <- col_names[!col_names %in% c('pids', 'X36')]
+
+dt7 <- dt1 %>% 
+  mutate(na_count=rowSums(is.na(select(., all_of(col_names))))) %>%
+  filter(na_count<length(col_names))
+
+head(dt7 %>% select(-na_count))
+```
+
+    ##   pids X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X20
+    ## 1    1  2  4  4  5 NA  1  5  1  3   5   3   2   4   1   1   1   5   4   4   5
+    ## 2    2  2  2  5  2  5  2  4  4  3  NA   5   5   3   5   3   4   1   3   1   4
+    ## 3    3  3  5  2 NA  1  2  3  1  2   1   3   2   1   1   3   4   1   1  NA  NA
+    ## 4    4 NA  3 NA  3  2  5  4  2  2   1   4   4   5   5   2   2   1   4   4   1
+    ## 5    5  3  3  3  2  2  3  3  5  3   4   1  NA   2   2   5   5   2   2   5   3
+    ## 6    6  4  5  5  4  3  1  2  3  3   1   4   1   2   3   2   2   5   5   5   3
+    ##   X21 X22 X23 X24 X25 X26 X27 X28 X29 X30 X31 X32 X33 X34 X35 X36 X37 X38 X39
+    ## 1  NA   3   2   5   2   4   5   5   1   2   4   4  NA   1   1   5   1   1   4
+    ## 2   5   5   4   3   3   4   5   5   5   3   3   3   3   3   5   4   3   5   2
+    ## 3   4   3   5   5   3   1   4   1   5   2   1   1   2   4  NA   3   1   3   4
+    ## 4   3   1   5   5  NA   5   3   1   4   5   5   2   4   3   3   3  NA   1   5
+    ## 5   3   3   4   5   3   1   5   5   1   3   5   5   4   1   3   1   4   1   3
+    ## 6   4   3   2   3  NA   3   2   4   4   5   1   5   4   4   2   5   4  NA   2
+    ##   X40 X41 X42 X43 X44 X45 X46 X47 X48 X49 X50
+    ## 1   1   2  NA   1   3   3   2   3   5   3   4
+    ## 2   3   4   5   4   2   2   1   1   4   2   1
+    ## 3   5   4   3   4   4   5   1   4   5   1   2
+    ## 4   5   3   4   5   5   2   2   2   2   4   3
+    ## 5   5   1   5   5   5   2   4   1   5   1   5
+    ## 6   5   5   4  NA   4   5   4   1   1   5   3
